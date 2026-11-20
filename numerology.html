@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ソウルナンバー占い</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf4f2;--surface:#fff;--ink:#3a2145;--sub:#7a6684;--line:#e8d9dc;--accent:#b8456b;--accent-ink:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#1f1526;--surface:#2b1d34;--ink:#f3e8f1;--sub:#b9a5c0;--line:#44314d;--accent:#e07a9d;--accent-ink:#2a1230}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#1f1526;--surface:#2b1d34;--ink:#f3e8f1;--sub:#b9a5c0;--line:#44314d;--accent:#e07a9d;--accent-ink:#2a1230}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;line-height:1.8;font-size:16px}
+main{max-width:560px;margin:0 auto;padding:20px 20px 48px}
+h1,h2,h3,.big,.pt{font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;font-weight:700}
+h1{font-size:26px;margin:8px 0 6px;line-height:1.4}
+h2{font-size:21px;margin:0 0 6px;line-height:1.5}
+h3{font-size:17px;margin:18px 0 8px}
+p{margin:0 0 12px}
+.sub{color:var(--sub);font-size:14px}
+.bar{height:6px;background:var(--line);border-radius:3px;margin:4px 0 22px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+label{display:block;font-weight:500;margin:16px 0 6px}
+input,textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+textarea{min-height:90px;resize:vertical}
+input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px;margin-top:22px}
+button{font:inherit;font-weight:500;border-radius:999px;padding:13px 22px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;flex:1}
+button.ghost{background:transparent;color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.chip{flex:none;padding:9px 14px;font-weight:400;font-size:15px;background:var(--surface);color:var(--ink);border-color:var(--line);text-align:left}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.q{margin-bottom:14px}.q p{margin-bottom:6px;font-weight:500}
+.err{color:var(--accent);font-size:14px;min-height:22px;margin-top:8px}
+.num{text-align:center;padding:14px 0 6px}
+.big{font-size:104px;line-height:1;color:var(--accent)}
+.sec{border-top:1px solid var(--line);padding-top:6px;margin-top:22px}
+.kv{margin-bottom:12px}.kv b{display:block;font-size:14px;color:var(--accent)}
+.kv ul{margin:2px 0 0;padding-left:20px}
+.score{text-align:center}
+.pt{font-size:64px;color:var(--accent);line-height:1.3}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<div class="bar"><i id="fill"></i></div>
+
+<section id="s0">
+<h1>ソウルナンバー占い</h1>
+<p class="sub">生年月日から、あなたの魂の数字を読み解きます。そのあと、いくつか質問に答えてください。ほとんどタップで選ぶだけです。</p>
+<label for="nm">お名前</label>
+<input id="nm" autocomplete="name">
+<label for="bd">生年月日</label>
+<input id="bd" type="date">
+<div class="err" id="e0"></div>
+<div class="row"><button id="b0">占いをはじめる</button></div>
+</section>
+
+<section id="s1" class="hide">
+<h2>いまの心の天気</h2>
+<p class="sub">今のあなたに近いものを、1つずつ選んでください。</p>
+<div id="qs"></div>
+<div class="err" id="e1"></div>
+<div class="row"><button class="ghost" data-back="0">戻る</button><button data-next="1">次へ</button></div>
+</section>
+
+<section id="s2" class="hide">
+<h2>人間関係で、心に残っていること</h2>
+<p class="sub">当てはまるものを、いくつでも選んでください。</p>
+<div class="chips" id="c2"></div>
+<div class="err" id="e2"></div>
+<div class="row"><button class="ghost" data-back="1">戻る</button><button data-next="2">次へ</button></div>
+</section>
+
+<section id="s3" class="hide">
+<h2>これまでに越えてきたこと</h2>
+<p class="sub">過去に辛かったこと、当てはまるものを、いくつでも選んでください。</p>
+<div class="chips" id="c3"></div>
+<div class="err" id="e3"></div>
+<div class="row"><button class="ghost" data-back="2">戻る</button><button data-next="3">次へ</button></div>
+</section>
+
+<section id="s4" class="hide">
+<h2>これから叶えたい未来</h2>
+<p class="sub">ピンときたものを、いくつでも選んでください。</p>
+<div id="c4"></div>
+<label for="t4">ほかにあれば、ひとこと（任意）</label>
+<textarea id="t4"></textarea>
+<div class="err" id="e4"></div>
+<div class="row"><button class="ghost" data-back="3">戻る</button><button data-next="4">結果を見る</button></div>
+</section>
+
+<section id="s5" class="hide">
+<div class="num"><div class="sub" id="who"></div><div class="big" id="num"></div><h2 id="ttl"></h2></div>
+<div class="sec score"><h3>いまの人生の点数</h3><div class="pt" id="pt"></div><p id="cm"></p></div>
+<div class="sec"><h3>ソウルナンバーの読み解き</h3><div id="read"></div></div>
+<div class="sec"><h3>あなたが答えた内容</h3><div id="ans"></div></div>
+<div class="row"><button class="ghost" id="cp">回答をコピー</button><button class="ghost" id="rs">最初から</button></div>
+<div class="err" id="e5"></div>
+</section>
+</main>
+<script>
+var D={
+1:["自分の道を切りひらく人","行動力とリーダーシップの持ち主。一人で決めて動くのが得意で、負けず嫌いな一面もあります。","行動力・決断力・独立心","頼るのが苦手で、一人で抱え込みがちです。","対等に話せる相手と好相性。弱音を見せると関係が深まります。","小さな一歩を先に決めて動くと、流れが生まれます。","朝一番に、今日の目標を一つ決める"],
+2:["人の気持ちに寄り添う人","やさしく穏やかで、場を和ませる人。相手の気持ちを察する力が高く、縁の下で支えるのが得意です。","共感力・協調性・聞き上手","相手に合わせすぎて、本音を後回しにしがちです。","信頼できる少人数の関係で力を発揮します。本音を一つ伝える練習を。","仲間やパートナーと組むと、力が出ます。","一日一回、自分の気持ちを言葉にする"],
+3:["言葉と笑顔で場を明るくする人","明るく表現力が豊かで、人を楽しませる天才。好奇心と遊び心を大切にし、感情が顔に出やすい人です。","表現力・明るさ・発想力","本音を飲み込むと苦しくなり、気分の波も出やすいです。","素直に話すほど縁が整うタイプ。楽しさを共有できる人と好相性です。","思いついたことを、まず発信してみましょう。","好きなことを人に話す時間を持つ"],
+4:["コツコツ積み上げる人","誠実で責任感が強く、安定を大切にする人。計画を立てて、着実に形にしていく力があります。","誠実さ・継続力・計画性","真面目すぎて、融通がきかないと見られることがあります。","約束を守る信頼の人。力を抜いて楽しむ時間を共有すると、より近づけます。","期限つきの計画に落とすと、実現しやすくなります。","整理整頓と、決まった習慣を持つ"],
+5:["変化と体験を求める人","自由を愛し、好奇心旺盛で順応力が高い人。新しい刺激や出会いから、エネルギーをもらいます。","柔軟性・行動力・好奇心","飽きやすく、縛られると息苦しくなります。","距離を取りたくなる癖があるので、連絡の頻度を伝えておくと安心です。","選択肢を広げつつ、期間を決めて一つ試しましょう。","いつもと違う道を歩いてみる"],
+6:["世話好きで愛情深い人","思いやりと責任感があり、身近な人を大切にする人。美的センスと、場を整える力があります。","愛情・面倒見・バランス感覚","尽くしすぎて、疲れや見返りへの期待が出がちです。","頼られるほど力を出します。先に自分を満たすと、関係も楽になります。","誰かの役に立つ形にすると、続けやすくなります。","自分のための時間を予定に入れる"],
+7:["深く考え、自分の世界を持つ人","分析力と探究心があり、本質を見抜く人。一人の時間で力を回復し、専門性を磨くのが得意です。","洞察力・探究心・集中力","考えすぎて、人に心を開くまで時間がかかります。","一人の時間が必要なだけだと伝えれば、誤解が減ります。","学びや専門性を軸にすると、道が見えます。","静かに過ごす時間と、自然に触れる"],
+8:["形にして成果を出す人","現実を動かす力と、組織やお金への感覚があります。目標を決めたら、粘り強くやり抜きます。","実行力・統率力・粘り強さ","強く見られがちで、頑張りすぎて休めないことがあります。","頼る姿が信頼につながる人。任せることを意識すると楽になります。","数字と期限で目標を置くと、一気に進みます。","頑張った自分をほめる習慣を作る"],
+9:["広い視野で人を受け止める人","包容力があり、人の痛みがわかる人。理想を大きく持ち、誰かのために動くことで輝きます。","包容力・理想・奉仕の心","手放すのが苦手で、過去を引きずることがあります。","広く受け止める人。終わった関係に区切りをつけると、心が軽くなります。","誰かのためになる、大きなテーマが合っています。","いらないものを一つ手放す"],
+11:["ひらめきと感受性が強い人","直感力と感受性が高く、人の心を敏感に感じ取る人。メッセージ性のある言葉や表現が得意です。","直感・感性・影響力","人の感情を拾いすぎて、心が疲れやすいです。","繊細さを理解してくれる人と好相性。一人で整える時間を持ちましょう。","直感をメモに残して、形にしていきましょう。","静かな場所で、気持ちを整える"],
+22:["大きなことを形にする人","理想を現実にする力を持つ、スケールの大きな人。責任感が強く、人や組織を動かせます。","構想力・実現力・責任感","期待を背負いすぎて、プレッシャーを感じやすいです。","周りに任せる練習をすると、関係が楽になります。","大きな構想を段階に分けると、実現に近づきます。","一日の終わりに、できたことを振り返る"],
+33:["無償の愛で人を支える人","深い慈愛で人を癒し、育てる人。自分より人を優先しがちで、周りに安心感を与えます。","慈愛・癒し・包容力","自分を後回しにして、疲れをため込みがちです。","対等な関係を意識すると、与える愛が長続きします。","人を育てる、癒す場づくりが合っています。","休むことも愛だと思って、休む"]};
+var Q=["人間関係に、満足している","毎日の暮らしが、充実している","自分のことを、好きだと思える","これからの未来に、ワクワクしている","心と体を、ゆったり休められている"],
+A=["そう思わない","あまり思わない","ややそう思う","とてもそう思う"],
+REL=["親や家族と、うまくいかなかった","友達に裏切られた・離れていった","職場の人間関係で苦しんだ","学校で、いじめや仲間外れがあった","本音を言えず、我慢し続けた","人の顔色ばかりうかがってきた","頼れる人がいなかった","怒られたり、否定されたりした","距離の取り方がわからない","人を信じるのが怖くなった","人と比べられて、自信をなくした","無視された・孤立した","断れずに、利用された","気を遣いすぎて疲れた","別れや疎遠で、後悔が残っている","特に思い当たらない"],
+PAST=["大きな失敗や挫折","仕事で行き詰まった","お金の不安や苦労","将来が見えず不安だった","自分を責め続けた","心や体の疲れで動けなかった","大切な人との別れ","夢をあきらめた","環境が大きく変わった","孤独を感じた","自信をなくした","何をしたいかわからなかった","特に思い当たらない"],
+V={"仕事・お金":["好きな仕事で働く","収入を増やす","経済的に自由になる","独立・起業する","資産をつくる","専門性を身につける"],
+"人間関係・心":["本音で話せる仲間がほしい","家族を大切にしたい","人に頼られる存在になる","自分を好きになる","心穏やかに過ごす","人を支える側になる"],
+"暮らし・生き方":["自由な時間をもつ","好きな場所に住む","旅行や体験を楽しむ","健康でいる","ゆとりある暮らし","趣味を楽しむ"],
+"成長・挑戦":["新しいことに挑戦する","学び続ける","発信する","人に影響を与える","大きな夢をかなえる","今の自分を変える"]};
+var $=function(i){return document.getElementById(i)},N=0,S={};
+function show(n){for(var i=0;i<6;i++)$("s"+i).classList.toggle("hide",i!==n);$("fill").style.width=(n*20)+"%";window.scrollTo(0,0)}
+function chips(id,arr,single){var c=$(id);arr.forEach(function(x,i){var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=x;b.dataset.v=i+1;b.setAttribute("aria-pressed","false");
+b.onclick=function(){if(single){[].forEach.call(c.children,function(o){o.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true")}else b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")==="true"?"false":"true")};c.appendChild(b)})}
+function sel(id){return[].map.call($(id).querySelectorAll('[aria-pressed="true"]'),function(b){return b.textContent})}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x)e.textContent=x;return e}
+function kv(p,l,t){var d=el("div","kv");d.appendChild(el("b","",l));d.appendChild(el("span","",t));p.appendChild(d)}
+function lst(p,l,a){var d=el("div","kv");d.appendChild(el("b","",l));var u=el("ul");a.forEach(function(x){u.appendChild(el("li","",x))});d.appendChild(u);p.appendChild(d)}
+Q.forEach(function(q,i){var d=el("div","q");d.appendChild(el("p","",q));var c=el("div","chips");c.id="q"+i;d.appendChild(c);$("qs").appendChild(d);chips("q"+i,A,true)});
+chips("c2",REL);chips("c3",PAST);
+Object.keys(V).forEach(function(k,j){$("c4").appendChild(el("h3","",k));var c=el("div","chips");c.id="v"+j;$("c4").appendChild(c);chips("v"+j,V[k])});
+function lp(s){var d=s.replace(/\D/g,""),t=0,i;for(i=0;i<d.length;i++)t+=+d[i];while(t>9&&t!==11&&t!==22&&t!==33){var u=0;String(t).split("").forEach(function(c){u+=+c});t=u}return t}
+$("b0").onclick=function(){if(!$("nm").value.trim()||!$("bd").value){$("e0").textContent="お名前と生年月日を入力してください。";return}$("e0").textContent="";N=lp($("bd").value);show(1)};
+function ok(k){if(k===1){for(var i=0;i<5;i++)if(!$("q"+i).querySelector('[aria-pressed="true"]'))return false;return true}
+return sel("c"+k).length>0}
+document.querySelectorAll("[data-next]").forEach(function(b){b.onclick=function(){var k=+b.dataset.next;if(!ok(k)){$("e"+k).textContent=k===1?"すべての質問を選んでください。":"1つ以上選んでください。";return}$("e"+k).textContent="";if(k===4)result();else show(k+1)}});
+document.querySelectorAll("[data-back]").forEach(function(b){b.onclick=function(){show(+b.dataset.back)}});
+function band(s){return s>=85?"とても満たされた状態です。今の流れを大切に、これからのビジョンを広げていきましょう。":s>=70?"おおむね安定しています。小さな不安をほどくと、もっと軽くなります。":s>=55?"うれしさと迷いが混ざる時期です。気持ちを整理して、一つ選ぶ力を育てましょう。":s>=40?"少し疲れがたまっているサインです。まず休むことと、話せる相手を持つことを大切にしましょう。":"いまは立ち止まって、自分をいたわる時期です。一人で抱えず、信頼できる人に話してみてください。"}
+function result(){var r=D[N],sum=0,st=[];Q.forEach(function(q,i){var b=$("q"+i).querySelector('[aria-pressed="true"]');sum+=+b.dataset.v;st.push(q+"："+b.textContent)});
+S={n:$("nm").value.trim(),bd:$("bd").value,sc:sum*5,st:st,rel:sel("c2"),past:sel("c3"),vis:sel("c4"),note:$("t4").value.trim()};
+$("who").textContent=S.n+" さんのソウルナンバー";$("num").textContent=N;$("ttl").textContent=r[0];$("pt").textContent=S.sc+"点";$("cm").textContent=band(S.sc);
+var R=$("read");R.textContent="";kv(R,"性格の傾向",r[1]);kv(R,"強み",r[2]);kv(R,"つまずきやすいところ",r[3]);kv(R,"人間関係の傾向",r[4]);kv(R,"ビジョンへのヒント",r[5]);kv(R,"開運のヒント",r[6]);
+var a=$("ans");a.textContent="";lst(a,"いまの心の天気",S.st);lst(a,"人間関係で、心に残っていること",S.rel);lst(a,"これまでに越えてきたこと",S.past);lst(a,"これから叶えたい未来",S.vis);if(S.note)kv(a,"ひとこと",S.note);
+show(5);$("fill").style.width="100%"}
+function txt(){var r=D[N];return["【ソウルナンバー占い】",S.n+" さん／生年月日 "+S.bd+"／ソウルナンバー "+N+"（"+r[0]+"）／人生の点数 "+S.sc+"点","","■いまの心の天気",S.st.join("\n"),"","■人間関係で、心に残っていること",S.rel.join("\n"),"","■これまでに越えてきたこと",S.past.join("\n"),"","■これから叶えたい未来",S.vis.join("\n"),S.note?"\n■ひとこと\n"+S.note:""].join("\n")}
+$("cp").onclick=function(){var m="コピーできませんでした。画面のスクリーンショットで送ってください。";try{navigator.clipboard.writeText(txt()).then(function(){$("e5").textContent="コピーしました。"},function(){$("e5").textContent=m})}catch(e){$("e5").textContent=m}};
+$("rs").onclick=function(){document.querySelectorAll('[aria-pressed="true"]').forEach(function(b){b.setAttribute("aria-pressed","false")});["nm","bd","t4"].forEach(function(i){$(i).value=""});$("e5").textContent="";show(0)};
+show(0);
+</script>
+</body>
+</html>
